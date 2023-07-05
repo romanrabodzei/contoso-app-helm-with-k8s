@@ -18,7 +18,7 @@ jobs:
         run: docker build . --file Dockerfile --tag contoso-website:latest
 
       - name: Push the Docker Image
-        run: docker push ${{secrets.ACR_NAME}}/contoso-website:latest
+        run: docker push ${{secrets.ACR_NAME}}.azurecr.io/contoso-website:latest
 
   deploy:
     runs-on: ubuntu-20.04
