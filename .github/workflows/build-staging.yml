@@ -42,6 +42,11 @@ jobs:
       - name: Run Helm Deploy
         run: |
           helm upgrade \
+            --install	\
+            --create-namespace \
+            --atomic \
+            --wait \
+            --namespace staging \
             contoso-app \
             ./helm-chart \
-            --set container.image=${{secrets.ACR_NAME}}/contoso-website:latest
+            --set container.image=${{secrets.ACR_NAME}}.azurecr.io/contoso-website:latest
