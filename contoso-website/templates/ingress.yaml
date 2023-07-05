@@ -1,0 +1,26 @@
+# Maintainers:
+#   - name: Roman Rabodzei
+#   - date: 7/4/2023
+#   - filename: ingress.yaml
+{{- if .Values.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  labels:
+    app: contoso-website
+  annotations:
+    kubernetes.io/ingress.class: addon-http-application-routing
+spec:
+  rules:
+    - host: {{ .Values.ingress.extraHosts.hostname }}.1127ea4cfee24aba846e.eastus.aksapp.io
+      http:
+        paths:
+          - backend:
+              service:
+                name: {{ $.Release.Name }}-service
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+{{- end }}

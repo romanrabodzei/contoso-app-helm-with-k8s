@@ -1,0 +1,36 @@
+# Maintainers:
+#   - name: Roman Rabodzei
+#   - date: 7/4/2023
+#   - filename: deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-deployment
+  labels:
+    app: contoso-website
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: contoso-website # template selector
+  template:
+    metadata:
+      labels:
+        app: contoso-website
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: contoso-website
+          image: {{ .Values.container.image }} # {{ .Values.registry }}/webapp:{{ .Values.tag }}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+          ports:
+            - containerPort: 80
+              name: http

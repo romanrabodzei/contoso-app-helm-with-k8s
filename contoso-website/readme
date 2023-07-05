@@ -1,0 +1,271 @@
+####################################
+
+# kubectl run k8sphpweb --generator=run-pod/v1 --image=adv4000/k8sphp:latest --port=80
+# kubectl get pods
+# kubectl delete pods k8sphpweb
+# kubectl describe pods k8sphpweb
+
+# for development/testing only
+
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: my-app
+#   labels:
+#     env: prod
+#     app: main
+# spec:
+#   containers:
+#     - name: container-web
+#       image: nginx:latest
+#       resources:
+#         requests:
+#           cpu: 100m
+#           memory: 128Mi
+#         limits:
+#           cpu: 250m
+#           memory: 256Mi
+#       ports:
+#         - containerPort: 80
+#     - name: container-api
+#       image: tomcat:8.5.38
+#       resources:
+#         requests:
+#           cpu: 100m
+#           memory: 128Mi
+#         limits:
+#           cpu: 250m
+#           memory: 256Mi
+#       ports:
+#         - containerPort: 8080
+
+####################################
+
+# kubectl create deployment my-deployment --image=adv4000/k8sphp:latest
+# kubectl describe deployment my-deployment
+# kubectl scale deployment my-deployment --replicas 4
+# kubectl autoscale deployment my-deployment --min=4 --max=6 --cpu-percent=80
+
+# kubectl rollout history deployment/contoso-website
+# kubectl rollout status deployment/contoso-website
+# kubectl set image deployment/contoso-website contoso-website=nginx:latest --record # for status command
+# kubectl rollout undo deployment/contoso-website # restored previous version
+# kubectl rollout undo deployment/contoso-website --to-revision=4
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: contoso-website
+#   labels:
+#     app: contoso-website
+# spec:
+#   replicas: 4
+#   selector:
+#     matchLabels:
+#       app: contoso-website
+#   template:
+#     metadata:
+#       labels:
+#         app: contoso-website
+#     spec:
+#       nodeSelector:
+#         kubernetes.io/os: linux
+#       containers:
+#         - name: contoso-website
+#           image: mcr.microsoft.com/mslearn/samples/contoso-website
+#           resources:
+#             requests:
+#               cpu: 100m
+#               memory: 128Mi
+#             limits:
+#               cpu: 250m
+#               memory: 256Mi
+#           ports:
+#             - containerPort: 80
+#               name: http
+# ---
+# apiVersion: autoscaling/v2beta1
+# kind: HorizontalPodAutoscaler
+# metadata:
+#   name: contoso-website-autoscl
+# spec:
+#   scaleTargetRef:
+#     apiVersion: apps/v1
+#     kind: Deployment
+#     name: contoso-website
+#   minReplicas: 4
+#   maxReplicas: 6
+#   metrics:
+#   - type: Resource
+#     resource:
+#       name: cpu
+#       target:
+#         type: Utilization
+#         averageUtilization: 70
+
+####################################
+
+# kubectl expose deployment contoso-website --type=ClisterIp --port 80
+# kubectl expose deployment contoso-website --type=NodePort --port 80
+# kubectl get service | grep ExternalIP
+# kubectl expose deployment contoso-website --type=LoadBalancer --port 80
+
+#service.yaml
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: contoso-website
+# spec:
+#   type: ClusterIP
+#   selector:
+#     app: contoso-website
+#   ports:
+#     - port: 80
+#       name: http
+#       protocol: TCP
+#       targetPort: http
+
+#service.yaml
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: my-web-deployment
+#   labels:
+#     app: my-k8s-deployment
+# spec:
+#   replicas: 3
+#   selector:
+#     matchLabels:
+#       project: myapp
+#   template:
+#     metadata:
+#       labels:
+#         project: myapp # template selector
+#     spec:
+#       containers:
+#         - name: myapp
+#           image: adv4000/k8sphp:latest
+#           resources:
+#             limits:
+#               memory: "128Mi"
+#               cpu: "500m"
+#           ports:
+#             - containerPort: 80
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: my-web-service
+#   labels:
+#     app: my-k8s-service
+# spec:
+#   selector:
+#     project: myapp # template selector
+#   ports:
+#     - name: myapp-listener
+#       protocol: TCP
+#       port: 80 # Port on LB
+#       targetPort: 80 # Port on POD
+#   type: LoadBalancer
+
+#service.yaml
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: myapp-multi
+#   labels:
+#     app: myapp-multi
+# spec:
+#   replicas: 3
+#   selector:
+#     matchLabels:
+#       app: myapp
+#   template:
+#     metadata:
+#       labels:
+#         app: myapp
+#     spec:
+#       containers:
+#         - name: myapp-php
+#           image: adv4000/k8sphp:latest
+#           resources:
+#             limits:
+#               memory: "128Mi"
+#               cpu: "500m"
+#           ports:
+#             - containerPort: 80
+#         - name: myapp-tom
+#           image: tomcat:8.5.38
+#           resources:
+#             limits:
+#               memory: "128Mi"
+#               cpu: "500m"
+#           ports:
+#             - containerPort: 8080
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: myapp
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     app: myapp
+#   ports:
+#     - name: php-listen
+#       protocol: TCP
+#       port: 80
+#       targetPort: 80
+#     - name: tom-listen
+#       protocol: TCP
+#       port: 8080
+#       targetPort: 8080
+
+####################################
+
+# az aks create --resource-group $RESOURCE_GROUP --name $CLUSTER_NAME --node-count 2 --enable-addons http_application_routing --generate-ssh-keys --node-vm-size Standard_B2s --network-plugin azure
+# az aks nodepool add --resource-group $RESOURCE_GROUP --cluster-name $CLUSTER_NAME --name userpool --node-count 2 --node-vm-size Standard_B2s
+# az aks show -g $RESOURCE_GROUP -n $CLUSTER_NAME -o tsv --query addonProfiles.httpApplicationRouting.config.HTTPApplicationRoutingZoneName
+# 1127ea4cfee24aba846e.eastus.aksapp.io
+
+#ingress.yaml
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: contoso-website
+#   annotations:
+#     kubernetes.io/ingress.class: addon-http-application-routing
+# spec:
+#   rules:
+#     - host: contoso.1127ea4cfee24aba846e.eastus.aksapp.io
+#       http:
+#         paths:
+#           - backend:
+#               service:
+#                name: contoso-website
+#                port:
+#                  name: http
+#             path: /
+#             pathType: Prefix
+
+#ingress.yaml
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: contoso-website-ingress
+#   labels:
+#     name: contoso-website
+#   annotations:
+#     kubernetes.io/ingress.class: addon-http-application-routing
+# spec:
+#   rules:
+#     - host: contoso1.1127ea4cfee24aba846e.eastus.aksapp.io
+#       http:
+#         paths:
+#           - backend:
+#               service:
+#                 name: contoso-website
+#                 port:
+#                   name: http
+#             path: /
+#             pathType: Prefix

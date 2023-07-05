@@ -1,0 +1,15 @@
+# default vaules for helm chart
+
+container:
+  image: mcr.microsoft.com/mslearn/samples/contoso-website
+
+replicaCount: 2
+
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 8
+
+ingress:
+  enabled: true
+  extraHosts:
+    hostname: contoso.1127ea4cfee24aba846e.eastus.aksapp.io
