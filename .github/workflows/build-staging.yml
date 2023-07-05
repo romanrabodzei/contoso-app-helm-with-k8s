@@ -20,7 +20,7 @@ jobs:
       - name: Push the Docker Image
         run: docker push ${{secrets.ACR_NAME}}.azurecr.io/contoso-website:latest
 
-  deploy_iamge_to_k8s:
+  deploy_image_to_k8s:
     runs-on: ubuntu-20.04
     needs: build_push_image
 
