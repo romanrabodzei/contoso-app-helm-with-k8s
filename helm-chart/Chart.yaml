@@ -3,6 +3,11 @@
 # helm install app app-helmchart/ -f prod_values.yaml
 # helm install app app-helmchart/ --set container.image=adv4000/k8sphp:latest --set replicaCount=4
 
+# Maintainers:
+#   - name: Roman Rabodzei
+#   - date: 7/4/2023
+#   - filename: chart.yaml
+
 apiVersion: v2
 name: contoso-website
 description: A Helm chart for Kubernetes. AKS Microsoft Learn
@@ -29,7 +34,3 @@ keywords:
   - aks
   - microsoft
   - learn
-
-maintainers:
-  - name: Roman Rabodzei
-  - date: 7/4/2023

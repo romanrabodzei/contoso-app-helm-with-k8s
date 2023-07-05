@@ -2,7 +2,7 @@ name: Build and push the latest build to staging
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ main ]
 
 jobs:
   build_push_image:
@@ -21,9 +21,34 @@ jobs:
           username: ${{ secrets.ACR_LOGIN }}
           password: ${{ secrets.ACR_PASSWORD }}
 
-      - name: Build and push staging images
-        uses: docker/build-push-action@v2
+      - name: Build the Docker image
+        run: docker build . --file Dockerfile --tag contoso-website:latest
+
+      - name: Push the Docker Image
+        run: docker push ${{secrets.ACR_NAME}}/contoso-website:latest
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: build_push_image
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Helm
+        uses: Azure/setup-helm@v1
         with:
-          context: .
-          push: true
-          tags: ${{secrets.ACR_NAME}}/contoso-website:latest
+          version: v3.12.1
+
+      - name: Get AKS Credentials
+        uses: Azure/aks-set-context@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          resource-group: ${{secrets.AKS_RESOURCE_GROUP}}
+          cluster-name: contoso-video
+
+      - name: Run Helm Deploy
+        run: |
+          helm upgrade \
+            contoso-app \
+            ./helm-chart \
+            --set container.image=${{secrets.ACR_NAME}}/contoso-website:latest
