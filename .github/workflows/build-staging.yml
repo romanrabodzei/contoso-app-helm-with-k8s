@@ -37,7 +37,7 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           resource-group: ${{secrets.AKS_RESOURCE_GROUP}}
-          cluster-name: contoso-video
+          cluster-name: ${{secrets.AKS_NAME}}
 
       - name: Run Helm Deploy
         run: |
