@@ -48,5 +48,5 @@ jobs:
             --wait \
             --namespace staging \
             contoso-app \
-            ./helm-chart #\
-            # --set container.image=${{secrets.ACR_NAME}}.azurecr.io/contoso-website:latest
+            ./helm-chart \
+            --set container.image=${{secrets.ACR_NAME}}.azurecr.io/contoso-website:latest
