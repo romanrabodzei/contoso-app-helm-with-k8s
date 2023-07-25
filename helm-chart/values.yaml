@@ -12,4 +12,4 @@ autoscaling:
 ingress:
   enabled: true
   extraHosts:
-    hostname: contoso.1127ea4cfee24aba846e.eastus.aksapp.io
+    hostname: contoso
