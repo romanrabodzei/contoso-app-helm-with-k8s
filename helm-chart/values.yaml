@@ -1,4 +1,8 @@
-# default vaules for helm chart
+# Maintainers:
+#   - name: Roman Rabodzei
+#   - date: 8/1/2023
+#   - filename: values.yaml
+#   - description: default vaules for helm chart
 
 container:
   image: mcr.microsoft.com/mslearn/samples/contoso-website
